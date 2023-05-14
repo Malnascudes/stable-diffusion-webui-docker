@@ -83,6 +83,100 @@ sudo systemctl restart docker
 [[Oil painting][https://civitai.com/models/20184/oil-painting]] 5.57GB
 - Checkpoint of a Stable Diffusion 1.5 model trained with oil paintings
 
+*** LoRA Training
+
+[[Reference video 1][https://www.youtube.com/watch?v=N4_-fB62Hwk]]
+[[Reference video 2][https://www.youtube.com/watch?v=k5imq01uvUY]]
+[[Reference video 3][https://www.youtube.com/watch?v=7m522D01mh0&t=557s&ab_channel=kasukanra]]
+
+Install the [[Training webui for the LoRA training scripts][https://github.com/bmaltais/kohya_ss#launching-the-gui-on-linux-and-macos]]. ([[original training scripts repo][https://github.com/kohya-ss/sd-scripts]])
+#+begin_src shell
+git clone https://github.com/bmaltais/kohya_ss.git
+cd kohya_ss
+# May need to chmod +x ./setup.sh if you're on a machine with stricter security.
+# There are additional options if needed for a runpod environment.
+# Call 'setup.sh -h' or 'setup.sh --help' for more information.
+./setup.sh
+#+end_src
+
+
+**** Dataset Preparation
+
+1 - Crop images to desired resolution.
+  - [[BIRME.net][https://www.birme.net/]] allows to resize and crop multiple images and visually select the portion that's croped out
+
+2 - Generate prompts for the images using the Bmaltais GUI captioning tool.
+    - Go to the Utilities/Captioning/BLIP Captioning
+    - Add "SOROLLA" in the =Prefix to add to BLIP caption= box. 
+    - Set =Min length= to 22 so the generated prompt is long and descriptive enough
+    - Leave other parametters at deffault
+    - Click =Caption Images=
+    - Captions will be generated as =.txt= files in the images folder.
+
+3 - Review generated prompts
+    - Remove all text like "a painting of ". Making it represent only the object so it learns the sytle on anything
+
+4 - Generate training folder structure using =Tools= tab in the WebUI.
+    - Desired number of reapeats per each image in =Repeats= (used 50)
+    - "SorollaLoRA" in =Instance prompt=
+    - "artwork style" in =Class prompt=
+    - Alternatively ensure that the folde struncture is:
+        |_img 
+            |_ <NUMBER OF REAPEATS>_<desired name> (folder with all the captioned images)
+        |_ model
+        |_ log
+
+    - This is not strictly necessary, the only necessaty folder is the img/<NUMBER OF REAPEATS>_<any name>, this tells the WebUI how many repeats to do, the "model" folder and "log" folder can then be what you prefer on the =Folders tab= of the Training section.
+
+
+**** Training
+
+***** Source Model tab
+Select the training model. Models used in experiments
+  - 1.5 model Used model: stable-diffusion-webui/models/Stable-diffusion/v1-5-pruned-emaonly.safetensors (the downloaded with the AUTOMATIC1111 webui)
+
+***** Folders tab
+Set:
+- =Image folder= to the "img" folder created before
+- =Logging folder= to the "log" folder created before. (Can be anything actualy but will keep things clean)
+- =Output folder= to the "model" folder created before. (Can be anything actualy but will keep things clean)
+- =Model output name= to "sorolla_lora_01" (Whatevet you like)
+
+***** Training Parametters
+- =Batch Size=: 1 (depends on GPU)
+- =Epochs=: 2 (affects training time)
+- =Caption extension=: ".txt"
+
+- =Mixed Precission= & =Save precision=: Try bf16 but low VRAM may need fp16
+- =Number of CPU threads per core=: 1 or 2
+- =Seed=: 420 (use a set seed to easier compare improvements)
+
+- =Learning rate=: 0.0001
+- =LR Scheduler=: Constant
+- =LR warmup (% of steps)=: 0%
+- =Optimizer=: AdamW8bit
+- =Cache Latents=: Depends on VRAM memory, selcted will require more VRAM and train faster.
+
+- =Text Encoder learning rate=: 5e-5
+- =Unet learning rate=: 0.0001
+- =Network Rank (Dimension)=: 200
+- =Network Alpha=: 200
+
+- =Max Resolution= 512,512
+
+
+Advanced Configuration:
+
+Left everythin and default and made sure the following parametters where set. Must try with and without them:
+- =Clip Skip=: 1 for stable diffusion v1.x models and 2 for v2.x models
+- =Shuffle caption=
+- =Color augmentation=: may help preserve color style
+- =Flip augmentation=
+- =Max num workers for DataLoader=: 1
+- =Memory efficient attention=: Saves memory
+
+*You can save the training parametters in a .json file to load them the next time*. Go To the =Configuration file= menu of the =Training Parametters= tab
+
 *** Usage
 **** WebGUI
 [[Github Repostitory][https://github.com/AUTOMATIC1111/stable-diffusion-webui]]
