@@ -17,7 +17,8 @@ RUN pip3 install --upgrade pip
 RUN pip install --pre triton
 RUN pip install numexpr
 
-RUN git clone -b v1.9 https://github.com/camenduru/stable-diffusion-webui
+# PR approving alwayson_scripts (later than the version 1.9 of the webui fork) https://github.com/AUTOMATIC1111/stable-diffusion-webui/pull/8187
+RUN git clone -b v2.2 https://github.com/camenduru/stable-diffusion-webui
 ADD --chown=user https://raw.githubusercontent.com/camenduru/stable-diffusion-webui-scripts/main/run_n_times.py /content/stable-diffusion-webui/scripts/run_n_times.py
 RUN git clone -b v1.9 https://github.com/camenduru/deforum-for-automatic1111-webui /content/stable-diffusion-webui/extensions/deforum-for-automatic1111-webui
 RUN git clone -b v1.9 https://github.com/camenduru/stable-diffusion-webui-images-browser /content/stable-diffusion-webui/extensions/stable-diffusion-webui-images-browser
