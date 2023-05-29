@@ -34,7 +34,7 @@ RUN sed -i -e 's/fastapi==0.90.1/fastapi==0.89.1/g' /content/stable-diffusion-we
 RUN sed -i -e 's/    start()/    #start()/g' /content/stable-diffusion-webui/launch.py
 RUN cd stable-diffusion-webui && python launch.py --skip-torch-cuda-test
 
-RUN pip install --pre xformers
+RUN pip install --pre xformers==0.0.16
 
 ADD --chown=user https://civitai.com/api/download/models/23979 /content/stable-diffusion-webui/models/Stable-diffusion/oilPainting_oilPaintingV10.safetensors
 
