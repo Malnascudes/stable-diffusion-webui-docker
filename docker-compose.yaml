@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.Lite
     command: python webui.py --xformers --listen --enable-insecure-extension-access --gradio-queue --api
     volumes:
-      - ./model/Stable-diffusion:/content/stable-diffusion-webui/models/Stable-diffusion/
+      - ./models/Stable-diffusion:/content/stable-diffusion-webui/models/Stable-diffusion/
     ports:
       - 7860:7860
     deploy:
