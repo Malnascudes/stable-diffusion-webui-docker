@@ -1,4 +1,4 @@
-# Dockerfile.Lite
+# Dockerfile
 
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.7.1/ubuntu2204/devel/cudnn8/Dockerfile
 # FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu22.04
@@ -14,7 +14,6 @@ WORKDIR /content
 USER user
 
 RUN pip3 install --upgrade pip
-RUN pip install --pre xformers
 RUN pip install --pre triton
 RUN pip install numexpr
 
@@ -34,8 +33,15 @@ RUN sed -i -e 's/fastapi==0.90.1/fastapi==0.89.1/g' /content/stable-diffusion-we
 RUN sed -i -e 's/    start()/    #start()/g' /content/stable-diffusion-webui/launch.py
 RUN cd stable-diffusion-webui && python launch.py --skip-torch-cuda-test
 
-ADD --chown=user https://huggingface.co/ckpt/sd15/resolve/main/v1-5-pruned-emaonly.ckpt /content/stable-diffusion-webui/models/Stable-diffusion/v1-5-pruned-emaonly.ckpt
+RUN pip install --pre xformers
+
+ADD --chown=user https://civitai.com/api/download/models/23979 /content/stable-diffusion-webui/models/Stable-diffusion/oilPainting_oilPaintingV10.safetensors
+
+ADD --chown=user download_models_if_missing.sh /content/stable-diffusion-webui/download_models_if_missing.sh
+RUN chmod +x /content/stable-diffusion-webui/download_models_if_missing.sh
+
+WORKDIR /content/stable-diffusion-webui
 
 EXPOSE 7860
 
-CMD cd /content/stable-diffusion-webui && python webui.py --xformers --listen --enable-insecure-extension-access --gradio-queue
+CMD cd /content/stable-diffusion-webui

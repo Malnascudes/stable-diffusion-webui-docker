@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  style-model:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python webui.py --xformers --listen --enable-insecure-extension-access --gradio-queue --api
+    volumes:
+      - ./models/Stable-diffusion:/content/stable-diffusion-webui/models/Stable-diffusion/
+    ports:
+      - 7860:7860
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
