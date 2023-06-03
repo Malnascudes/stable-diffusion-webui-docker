@@ -33,6 +33,9 @@ RUN pip install --pre xformers==0.0.16
 ADD --chown=user download_models_if_missing.sh /content/stable-diffusion-webui/download_models_if_missing.sh
 RUN chmod +x /content/stable-diffusion-webui/download_models_if_missing.sh
 
+ADD --chown=user download_models_if_missing.sh /content/stable-diffusion-webui/download_models_if_missing.sh
+RUN chmod +x /content/stable-diffusion-webui/download_models_if_missing.sh
+
 WORKDIR /content/stable-diffusion-webui
 
 EXPOSE 7860
