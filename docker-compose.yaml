@@ -8,6 +8,7 @@ services:
     command: python webui.py --xformers --listen --enable-insecure-extension-access --gradio-queue --api
     volumes:
       - ./models/Stable-diffusion:/content/stable-diffusion-webui/models/Stable-diffusion/
+      - ./style_model/stable-diffusion-webui-docker/models/Controlnet:/content/stable-diffusion-webui/extensions/sd-webui-controlnet/models/
     ports:
       - 7860:7860
     deploy:

@@ -17,15 +17,10 @@ RUN pip3 install --upgrade pip
 RUN pip install --pre triton
 RUN pip install numexpr
 
-RUN git clone -b v1.9 https://github.com/camenduru/stable-diffusion-webui
-ADD --chown=user https://raw.githubusercontent.com/camenduru/stable-diffusion-webui-scripts/main/run_n_times.py /content/stable-diffusion-webui/scripts/run_n_times.py
-RUN git clone -b v1.9 https://github.com/camenduru/deforum-for-automatic1111-webui /content/stable-diffusion-webui/extensions/deforum-for-automatic1111-webui
-RUN git clone -b v1.9 https://github.com/camenduru/stable-diffusion-webui-images-browser /content/stable-diffusion-webui/extensions/stable-diffusion-webui-images-browser
-RUN git clone -b v1.9 https://github.com/camenduru/stable-diffusion-webui-huggingface /content/stable-diffusion-webui/extensions/stable-diffusion-webui-huggingface
-RUN git clone -b v1.9 https://github.com/camenduru/sd-civitai-browser /content/stable-diffusion-webui/extensions/sd-civitai-browser
+# PR approving alwayson_scripts (later than the version 1.9 of the webui fork) https://github.com/AUTOMATIC1111/stable-diffusion-webui/pull/8187
+RUN git clone -b v2.2 https://github.com/camenduru/stable-diffusion-webui
 RUN git clone -b v1.9 https://github.com/camenduru/sd-webui-additional-networks /content/stable-diffusion-webui/extensions/sd-webui-additional-networks
-RUN git clone -b v1.9 https://github.com/camenduru/sd-webui-tunnels /content/stable-diffusion-webui/extensions/sd-webui-tunnels
-RUN git clone -b v1.9 https://github.com/camenduru/batchlinks-webui /content/stable-diffusion-webui/extensions/batchlinks-webui
+RUN git clone https://github.com/Mikubill/sd-webui-controlnet.git /content/stable-diffusion-webui/extensions/sd-webui-controlnet
 RUN cd stable-diffusion-webui && git reset --hard
 
 RUN sed -i -e '''/    prepare_environment()/a\    os.system\(f\"""sed -i -e ''\"s/dict()))/dict())).cuda()/g\"'' /content/stable-diffusion-webui/repositories/stable-diffusion-stability-ai/ldm/util.py""")''' /content/stable-diffusion-webui/launch.py
@@ -33,9 +28,10 @@ RUN sed -i -e 's/fastapi==0.90.1/fastapi==0.89.1/g' /content/stable-diffusion-we
 RUN sed -i -e 's/    start()/    #start()/g' /content/stable-diffusion-webui/launch.py
 RUN cd stable-diffusion-webui && python launch.py --skip-torch-cuda-test
 
-RUN pip install --pre xformers
+RUN pip install --pre xformers==0.0.16
 
-ADD --chown=user https://civitai.com/api/download/models/23979 /content/stable-diffusion-webui/models/Stable-diffusion/oilPainting_oilPaintingV10.safetensors
+ADD --chown=user download_models_if_missing.sh /content/stable-diffusion-webui/download_models_if_missing.sh
+RUN chmod +x /content/stable-diffusion-webui/download_models_if_missing.sh
 
 ADD --chown=user download_models_if_missing.sh /content/stable-diffusion-webui/download_models_if_missing.sh
 RUN chmod +x /content/stable-diffusion-webui/download_models_if_missing.sh
